@@ -50,5 +50,21 @@ const obtenerPorUsuario = async (req, res, next) => {
     res.status(200).json({ ok: true, data })
   } catch (e) { next(e) }
 }
+const actualizarDatos = async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('judokas')
+      .update({
+        categoria: req.body.categoria,
+        peso_competitivo: req.body.peso_competitivo,
+        cinturon_actual: req.body.cinturon_actual
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single()
+    if (error) throw new Error(error.message)
+    res.status(200).json({ ok: true, data })
+  } catch (e) { next(e) }
+}
 
-module.exports = { listar, listarSinClub, listarPorClub, obtener, obtenerPorUsuario }
+module.exports = { listar, listarSinClub, listarPorClub, obtener, obtenerPorUsuario, actualizarDatos }
