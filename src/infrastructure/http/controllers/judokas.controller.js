@@ -39,7 +39,7 @@ const obtenerPorUsuario = async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('judokas')
-      .select(`*, usuarios(id, nombre, apellido_paterno, apellido_materno, correo, ci, genero, avatar_url), clubes(id, nombre_club)`)
+      .select(`*, usuarios(id, nombre, apellido_paterno, apellido_materno, correo, ci, genero, avatar_url, fecha_nacimiento, numero_celular), clubes(id, nombre_club)`)
       .eq('usuario_id', req.params.usuarioId)
       .single()
     if (error || !data) return res.status(404).json({ ok: false, message: 'Judoka no encontrado' })
@@ -71,7 +71,6 @@ const desactivar = async (req, res, next) => {
 
     if (!motivo) return res.status(400).json({ ok: false, message: 'El motivo es requerido' })
 
-    // Obtener datos del judoka antes de desactivar
     const { data: judoka } = await supabase
       .from('judokas')
       .select('*, usuarios(nombre, apellido_paterno)')
@@ -80,13 +79,18 @@ const desactivar = async (req, res, next) => {
 
     if (!judoka) return res.status(404).json({ ok: false, message: 'Judoka no encontrado' })
 
-    // Desactivar judoka
+    // Obtener nombre del que desactiva
+    const { data: realizadoPor } = await supabase
+      .from('usuarios')
+      .select('nombre, apellido_paterno')
+      .eq('id', req.usuario.id)
+      .single()
+
     await supabase
       .from('judokas')
       .update({ activo: false, club_id: null, entrenador_id: null })
       .eq('id', judokaId)
 
-    // Guardar en historial
     await supabase
       .from('historial_desactivaciones')
       .insert([{
@@ -94,7 +98,9 @@ const desactivar = async (req, res, next) => {
         club_id: judoka.club_id,
         entrenador_id: judoka.entrenador_id,
         realizado_por_id: req.usuario.id,
-        realizado_por_nombre: `${req.usuario.nombre || ''} ${req.usuario.apellidoPaterno || ''}`.trim(),
+        realizado_por_nombre: realizadoPor
+          ? `${realizadoPor.nombre} ${realizadoPor.apellido_paterno}`
+          : 'Sin nombre',
         motivo
       }])
 
@@ -121,4 +127,34 @@ const cambiarClub = async (req, res, next) => {
   } catch (e) { next(e) }
 }
 
-module.exports = { listar, listarSinClub, listarPorClub, obtener, obtenerPorUsuario, actualizarDatos, desactivar, cambiarClub }
+const listarHistorial = async (req, res, next) => {
+  try {
+    let query = supabase
+      .from('historial_desactivaciones')
+      .select(`
+        *,
+        judokas(
+          usuario_id,
+          usuarios(nombre, apellido_paterno, apellido_materno)
+        ),
+        clubes(nombre_club),
+        senseis(
+          usuarios(nombre, apellido_paterno)
+        ),
+        realizadoPor:usuarios!historial_desactivaciones_realizado_por_id_fkey(
+          nombre, apellido_paterno
+        )
+      `)
+      .order('fecha', { ascending: false })
+
+    // Si es sensei solo ve los de su club
+    if (req.usuario.rol === 'sensei') {
+      query = query.eq('club_id', req.usuario.clubId)
+    }
+
+    const { data, error } = await query
+    if (error) throw new Error(error.message)
+    res.status(200).json({ ok: true, data })
+  } catch (e) { next(e) }
+}
+module.exports = { listar, listarSinClub, listarPorClub, obtener, obtenerPorUsuario, actualizarDatos, desactivar, cambiarClub, listarHistorial }
