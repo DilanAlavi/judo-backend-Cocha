@@ -1,6 +1,22 @@
 const supabase = require('../database/supabase')
 
 class SupabaseMacrocicloRepository {
+    async listarTodos() {
+        const { data, error } = await supabase
+          .from('macrociclos')
+          .select(`
+            *,
+            senseis(usuario_id, usuarios(nombre, apellido_paterno)),
+            macrociclo_judokas(
+              id, activo,
+              judokas(id, usuario_id, usuarios(nombre, apellido_paterno))
+            )
+          `)
+          .eq('activo', true)
+          .order('created_at', { ascending: false })
+        if (error) throw new Error(error.message)
+        return data
+      }
   async listarPorSensei(senseiId) {
     const { data, error } = await supabase
       .from('macrociclos')

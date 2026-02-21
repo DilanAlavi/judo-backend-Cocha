@@ -7,11 +7,16 @@ const SupabaseMacrocicloRepository = require('../../repositories/SupabaseMacroci
 const repo = () => new SupabaseMacrocicloRepository()
 
 const listar = async (req, res, next) => {
-  try {
-    const data = await new ListarMacrociclos(repo()).ejecutar(req.usuario.senseiId)
-    res.status(200).json({ ok: true, data })
-  } catch (e) { next(e) }
-}
+    try {
+      let data
+      if (req.usuario.rol === 'admin' || req.usuario.rol === 'asociacion') {
+        data = await repo().listarTodos()
+      } else {
+        data = await new ListarMacrociclos(repo()).ejecutar(req.usuario.senseiId)
+      }
+      res.status(200).json({ ok: true, data })
+    } catch (e) { next(e) }
+  }
 
 const obtener = async (req, res, next) => {
   try {
