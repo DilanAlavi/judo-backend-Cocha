@@ -112,7 +112,6 @@ class SupabaseMicrocicloRepository {
     if (error) throw new Error(error.message)
     return true
   }
-  
 }
 
 module.exports = SupabaseMicrocicloRepository
