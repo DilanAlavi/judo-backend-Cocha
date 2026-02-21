@@ -7,6 +7,7 @@ const atletasClubRoutes = require('./infrastructure/http/routes/atletasClub.rout
 const errorMiddleware = require('./infrastructure/http/middlewares/error.middleware')
 const ejerciciosRoutes = require('./infrastructure/http/routes/ejercicios.routes')
 const macrociclosRoutes = require('./infrastructure/http/routes/macrociclos.routes')
+const mesociclosRoutes = require('./infrastructure/http/routes/mesociclos.routes')
 const app = express()
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
@@ -18,6 +19,7 @@ app.use('/api/judokas', judokasRoutes)
 app.use('/api/atletas-club', atletasClubRoutes)
 app.use('/api/ejercicios', ejerciciosRoutes)
 app.use('/api/macrociclos', macrociclosRoutes)
+app.use('/api/mesociclos', mesociclosRoutes)
 app.get('/', (req, res) => res.json({ ok: true, mensaje: 'API Judo ADDJC funcionando' }))
 
 app.use(errorMiddleware)
