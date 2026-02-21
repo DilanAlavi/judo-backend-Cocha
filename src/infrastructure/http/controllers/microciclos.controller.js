@@ -89,9 +89,35 @@ const quitarJudoka = async (req, res, next) => {
     res.status(200).json({ ok: true, message: 'Judoka removido' })
   } catch (e) { next(e) }
 }
+const listarTodos = async (req, res, next) => {
+    try {
+      let data
+      if (req.usuario.rol === 'admin' || req.usuario.rol === 'asociacion') {
+        data = await repo().listarTodos()
+      } else {
+        data = await repo().listarPorSensei(req.usuario.senseiId)
+      }
+      res.status(200).json({ ok: true, data })
+    } catch (e) { next(e) }
+  }
+  const asignarJudokaEjercicio = async (req, res, next) => {
+    try {
+      const { judoka_id } = req.body
+      if (!judoka_id) return res.status(400).json({ ok: false, message: 'judoka_id requerido' })
+      const data = await repo().asignarJudokaEjercicio(req.params.ejercicioId, judoka_id)
+      res.status(201).json({ ok: true, data })
+    } catch (e) { next(e) }
+  }
+  
+  const quitarJudokaEjercicio = async (req, res, next) => {
+    try {
+      await repo().quitarJudokaEjercicio(req.params.ejercicioId, req.params.judokaId)
+      res.status(200).json({ ok: true })
+    } catch (e) { next(e) }
+  }
 
 module.exports = {
   listarPorMesociclo, obtener, crear, actualizar,
   agregarEjercicio, actualizarEjercicio, eliminarEjercicio,
-  asignarJudoka, quitarJudoka
+  asignarJudoka, quitarJudoka,listarTodos, asignarJudokaEjercicio,quitarJudokaEjercicio
 }
