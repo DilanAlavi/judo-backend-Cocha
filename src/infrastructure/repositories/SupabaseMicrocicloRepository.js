@@ -53,6 +53,18 @@ class SupabaseMicrocicloRepository {
 
   // ✅ AQUÍ VA LA COPIA AUTOMÁTICA (y NO rompe nada más)
   async crear(datos) {
+    // 0) Validar que no exista otro microciclo en la misma fecha DENTRO del mismo mesociclo
+    const { data: existente } = await supabase
+      .from('microciclos')
+      .select('id')
+      .eq('mesociclo_id', datos.mesociclo_id)
+      .eq('fecha', datos.fecha)
+      .maybeSingle()
+
+    if (existente) {
+      throw new Error('Ya existe un microciclo para esta fecha en este mesociclo')
+    }
+
     // 1) Crear microciclo
     const { data, error } = await supabase
       .from('microciclos')

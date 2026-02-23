@@ -32,7 +32,12 @@ const crear = async (req, res, next) => {
       mesociclo_id, fecha, estado: 'Pendiente'
     })
     res.status(201).json({ ok: true, data })
-  } catch (e) { next(e) }
+  } catch (e) {
+    if (e.message === 'Ya existe un microciclo para esta fecha en este mesociclo') {
+      return res.status(409).json({ ok: false, message: e.message })
+    }
+    next(e)
+  }
 }
 
 const actualizar = async (req, res, next) => {
