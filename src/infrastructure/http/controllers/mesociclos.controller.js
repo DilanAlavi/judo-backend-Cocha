@@ -33,12 +33,13 @@ const obtener = async (req, res, next) => {
 
 const crear = async (req, res, next) => {
   try {
-    const { macrociclo_id, nombre, fecha_inicio, fecha_fin } = req.body
+    const { macrociclo_id, nombre, fecha_inicio, fecha_fin, fase } = req.body
     if (!macrociclo_id || !nombre || !fecha_inicio || !fecha_fin) {
       return res.status(400).json({ ok: false, message: 'Todos los campos son requeridos' })
     }
     const data = await new CrearMesociclo(repo()).ejecutar({
-      macrociclo_id, nombre, fecha_inicio, fecha_fin
+      macrociclo_id, nombre, fecha_inicio, fecha_fin,
+      fase: fase || null
     })
     res.status(201).json({ ok: true, data })
   } catch (e) {
