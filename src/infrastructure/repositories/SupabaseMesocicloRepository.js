@@ -88,8 +88,8 @@ class SupabaseMesocicloRepository {
       }
       
       async crear(datos) {
-        const { macrociclo_id, nombre, fecha_inicio, fecha_fin } = datos
-      
+        const { macrociclo_id, nombre, fecha_inicio, fecha_fin, fase } = datos
+
         // Validar fechas dentro del macrociclo
         const { data: macro, error: errorMacro } = await supabase
           .from('macrociclos')
@@ -104,7 +104,7 @@ class SupabaseMesocicloRepository {
       
         const { data, error } = await supabase
           .from('mesociclos')
-          .insert([{ macrociclo_id, nombre, fecha_inicio, fecha_fin }])
+          .insert([{ macrociclo_id, nombre, fecha_inicio, fecha_fin, fase: fase || null }])
           .select()
           .single()
         if (error) throw new Error(error.message)

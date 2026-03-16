@@ -49,13 +49,19 @@ const obtenerPorUsuario = async (req, res, next) => {
 
 const actualizarDatos = async (req, res, next) => {
   try {
+    const ESTADOS_VALIDOS = ['activo', 'lesionado', 'restringido', 'reincorporacion']
+    const { categoria, peso_competitivo, cinturon_actual, estado_medico } = req.body
+
+    if (estado_medico && !ESTADOS_VALIDOS.includes(estado_medico)) {
+      return res.status(400).json({ ok: false, message: 'Estado médico no válido' })
+    }
+
+    const campos = { categoria, peso_competitivo, cinturon_actual }
+    if (estado_medico) campos.estado_medico = estado_medico
+
     const { data, error } = await supabase
       .from('judokas')
-      .update({
-        categoria: req.body.categoria,
-        peso_competitivo: req.body.peso_competitivo,
-        cinturon_actual: req.body.cinturon_actual
-      })
+      .update(campos)
       .eq('id', req.params.id)
       .select()
       .single()

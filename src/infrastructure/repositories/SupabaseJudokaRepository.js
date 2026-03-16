@@ -31,6 +31,7 @@ class SupabaseJudokaRepository extends IJudokaRepository {
       .select(`
         *,
         usuarios(id, nombre, apellido_paterno, apellido_materno, correo, ci, genero, avatar_url),
+        clubes(id, nombre_club),
         macrociclo_judokas(id, activo)
       `)
       .eq('club_id', clubId)
