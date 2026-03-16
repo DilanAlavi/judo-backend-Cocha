@@ -22,7 +22,7 @@ const obtener = async (req, res, next) => {
 
 const crear = async (req, res, next) => {
   try {
-    const { nombre, categoria, tiempo_base, series_base, descripcion, video_url } = req.body
+    const { nombre, categoria, tiempo_base, series_base, descripcion, video_url, fase_recomendada } = req.body
     if (!nombre || !categoria || !tiempo_base) {
       return res.status(400).json({ ok: false, message: 'Nombre, categoría y tiempo base son requeridos' })
     }
@@ -31,6 +31,7 @@ const crear = async (req, res, next) => {
       series_base: series_base || null,
       descripcion: descripcion || null,
       video_url: video_url || null,
+      fase_recomendada: fase_recomendada || null,
       creado_por_id: req.usuario.id
     })
     res.status(201).json({ ok: true, data })
