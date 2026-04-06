@@ -4,7 +4,15 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --verbose",
+    "test:coverage": "jest --coverage --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",
@@ -15,6 +23,7 @@
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.11"
   }
 }
