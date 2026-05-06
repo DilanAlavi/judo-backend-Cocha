@@ -56,8 +56,16 @@ const actualizarDatos = async (req, res, next) => {
       return res.status(400).json({ ok: false, message: 'Estado médico no válido' })
     }
 
-    const campos = { categoria, peso_competitivo, cinturon_actual }
-    if (estado_medico) campos.estado_medico = estado_medico
+    // Solo incluir los campos que vienen en el body para no pisar otros con undefined
+    const campos = {}
+    if (categoria        !== undefined) campos.categoria        = categoria
+    if (peso_competitivo !== undefined) campos.peso_competitivo = peso_competitivo
+    if (cinturon_actual  !== undefined) campos.cinturon_actual  = cinturon_actual
+    if (estado_medico    !== undefined) campos.estado_medico    = estado_medico
+
+    if (Object.keys(campos).length === 0) {
+      return res.status(400).json({ ok: false, message: 'No se enviaron campos a actualizar' })
+    }
 
     const { data, error } = await supabase
       .from('judokas')
