@@ -1,6 +1,7 @@
 const ListarJudokas = require('../../../application/judokas/ListarJudokas')
 const ListarJudokasSinClub = require('../../../application/judokas/ListarJudokasSinClub')
 const ListarJudokasPorClub = require('../../../application/judokas/ListarJudokasPorClub')
+const ListarEstudiantesSensei = require('../../../application/judokas/ListarEstudiantesSensei')
 const ObtenerJudoka = require('../../../application/judokas/ObtenerJudoka')
 const SupabaseJudokaRepository = require('../../repositories/SupabaseJudokaRepository')
 const supabase = require('../../database/supabase')
@@ -9,7 +10,26 @@ const repo = () => new SupabaseJudokaRepository()
 
 const listar = async (req, res, next) => {
   try {
-    const resultado = await new ListarJudokas(repo()).ejecutar(req.usuario.rol)
+    const { rol, id: usuarioId } = req.usuario
+
+    console.log('[GET /judokas] rol:', rol, '| usuarioId:', usuarioId)
+
+    let clubId = null
+    if (rol === 'sensei') {
+      const { data: senseiRow, error: errSensei } = await supabase
+        .from('senseis')
+        .select('club_id')
+        .eq('usuario_id', usuarioId)
+        .single()
+
+      console.log('[GET /judokas] senseiRow:', senseiRow, '| error:', errSensei)
+      clubId = senseiRow?.club_id || null
+    }
+
+    console.log('[GET /judokas] clubId final:', clubId)
+
+    const resultado = await new ListarJudokas(repo()).ejecutar(rol, clubId)
+    console.log('[GET /judokas] judokas devueltos:', resultado?.length)
     res.status(200).json({ ok: true, data: resultado })
   } catch (e) { next(e) }
 }
@@ -24,6 +44,16 @@ const listarSinClub = async (req, res, next) => {
 const listarPorClub = async (req, res, next) => {
   try {
     const resultado = await new ListarJudokasPorClub(repo()).ejecutar(req.params.clubId)
+    res.status(200).json({ ok: true, data: resultado })
+  } catch (e) { next(e) }
+}
+
+const misEstudiantes = async (req, res, next) => {
+  try {
+    const { id: usuarioId } = req.usuario
+    console.log('[GET /judokas/mis-estudiantes] usuarioId:', usuarioId)
+    const resultado = await new ListarEstudiantesSensei().ejecutar(usuarioId)
+    console.log('[GET /judokas/mis-estudiantes] devueltos:', resultado?.length)
     res.status(200).json({ ok: true, data: resultado })
   } catch (e) { next(e) }
 }
@@ -171,4 +201,4 @@ const listarHistorial = async (req, res, next) => {
     res.status(200).json({ ok: true, data })
   } catch (e) { next(e) }
 }
-module.exports = { listar, listarSinClub, listarPorClub, obtener, obtenerPorUsuario, actualizarDatos, desactivar, cambiarClub, listarHistorial }
+module.exports = { listar, listarSinClub, listarPorClub, misEstudiantes, obtener, obtenerPorUsuario, actualizarDatos, desactivar, cambiarClub, listarHistorial }
