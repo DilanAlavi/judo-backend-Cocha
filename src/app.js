@@ -12,7 +12,23 @@ const microciclosRoutes = require('./infrastructure/http/routes/microciclos.rout
 const testsFisicosRoutes = require('./infrastructure/http/routes/tests_fisicos.routes')
 const app = express()
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://judo-frontend-cocha-7dju.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean)
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error(`CORS bloqueado: ${origin}`))
+    }
+  },
+  credentials: true,
+}))
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)

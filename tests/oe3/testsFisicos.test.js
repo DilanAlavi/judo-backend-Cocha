@@ -5,7 +5,6 @@ const ListarPorMesociclo = require('../../src/application/tests_fisicos/ListarPo
 
 describe('OE3 — Tests Físicos', () => {
 
-  // ──────────────────────────────────────────
   describe('CrearTestFisico', () => {
 
     it('UT-OE3-01: calcula VO2 de navette antes de guardar y llama repo.crear', async () => {
@@ -19,7 +18,7 @@ describe('OE3 — Tests Físicos', () => {
       })
 
       expect(repo.crear).toHaveBeenCalledTimes(1)
-      // Verificar que calcularTodosVO2 enriqueció los datos antes de crear
+
       const datosPasados = repo.crear.mock.calls[0][0]
       expect(datosPasados.navette_vo2).toBeDefined()
       expect(typeof datosPasados.navette_vo2).toBe('number')
@@ -38,7 +37,6 @@ describe('OE3 — Tests Físicos', () => {
 
   })
 
-  // ──────────────────────────────────────────
   describe('ActualizarTestFisico', () => {
 
     it('UT-OE3-03: recalcula métricas y actualiza registro en repo', async () => {
@@ -67,7 +65,6 @@ describe('OE3 — Tests Físicos', () => {
 
   })
 
-  // ──────────────────────────────────────────
   describe('ListarPorJudoka', () => {
 
     it('UT-OE3-05: retorna lista de tests del judoka', async () => {
@@ -96,7 +93,7 @@ describe('OE3 — Tests Físicos', () => {
 
   })
 
-  // ──────────────────────────────────────────
+  
   describe('ListarPorMesociclo', () => {
 
     it('UT-OE3-07: retorna todos los tests del mesociclo', async () => {
