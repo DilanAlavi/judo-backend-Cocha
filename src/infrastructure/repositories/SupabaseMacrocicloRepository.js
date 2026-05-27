@@ -1,8 +1,19 @@
 const supabase = require('../database/supabase')
 
 class SupabaseMacrocicloRepository {
-    async listarTodos() {
-        const { data, error } = await supabase
+
+  async autoDesactivarVencidos() {
+    const hoy = new Date().toISOString().split('T')[0]
+    await supabase
+      .from('macrociclos')
+      .update({ activo: false })
+      .lt('fecha_fin', hoy)
+      .eq('activo', true)
+  }
+
+  async listarTodos() {
+    await this.autoDesactivarVencidos()
+    const { data, error } = await supabase
           .from('macrociclos')
           .select(`
             *,
@@ -18,6 +29,7 @@ class SupabaseMacrocicloRepository {
         return data
       }
   async listarPorSensei(senseiId) {
+    await this.autoDesactivarVencidos()
     const { data, error } = await supabase
       .from('macrociclos')
       .select(`
@@ -73,14 +85,22 @@ class SupabaseMacrocicloRepository {
   }
 
   async asignarJudoka(macrocicloId, judokaId) {
+    const hoy = new Date().toISOString().split('T')[0]
+
+    // Buscar asignaciones activas cuyo macrociclo todavía no ha terminado
     const { data: existente } = await supabase
       .from('macrociclo_judokas')
-      .select('id')
+      .select('id, macrociclos(fecha_fin)')
       .eq('judoka_id', judokaId)
       .eq('activo', true)
 
-    if (existente && existente.length > 0) {
-      throw new Error('El judoka ya tiene un macrociclo activo')
+    const tieneActivoVigente = (existente || []).some(mj => {
+      const fechaFin = mj.macrociclos?.fecha_fin
+      return fechaFin && fechaFin >= hoy
+    })
+
+    if (tieneActivoVigente) {
+      throw new Error('El judoka ya tiene un macrociclo activo vigente')
     }
 
     const { data, error } = await supabase

@@ -1,7 +1,18 @@
 const supabase = require('../database/supabase')
 
 class SupabaseMicrocicloRepository {
+
+  async autoCompletarVencidos() {
+    const hoy = new Date().toISOString().split('T')[0]
+    await supabase
+      .from('microciclos')
+      .update({ estado: 'Completado' })
+      .lt('fecha', hoy)
+      .eq('estado', 'Pendiente')
+  }
+
   async listarPorMesociclo(mesocicloId) {
+    await this.autoCompletarVencidos()
     const { data, error } = await supabase
       .from('microciclos')
       .select(`
@@ -168,6 +179,7 @@ class SupabaseMicrocicloRepository {
   }
 
   async listarTodos() {
+    await this.autoCompletarVencidos()
     const { data, error } = await supabase
       .from('microciclos')
       .select(`
@@ -191,6 +203,7 @@ class SupabaseMicrocicloRepository {
   }
 
   async listarPorSensei(senseiId) {
+    await this.autoCompletarVencidos()
     const { data: macros, error: errorMacros } = await supabase
       .from('macrociclos')
       .select('id')
