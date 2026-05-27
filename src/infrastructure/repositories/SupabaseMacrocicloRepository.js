@@ -2,17 +2,7 @@ const supabase = require('../database/supabase')
 
 class SupabaseMacrocicloRepository {
 
-  async autoDesactivarVencidos() {
-    const hoy = new Date().toISOString().split('T')[0]
-    await supabase
-      .from('macrociclos')
-      .update({ activo: false })
-      .lt('fecha_fin', hoy)
-      .eq('activo', true)
-  }
-
   async listarTodos() {
-    await this.autoDesactivarVencidos()
     const { data, error } = await supabase
           .from('macrociclos')
           .select(`
@@ -29,11 +19,11 @@ class SupabaseMacrocicloRepository {
         return data
       }
   async listarPorSensei(senseiId) {
-    await this.autoDesactivarVencidos()
     const { data, error } = await supabase
       .from('macrociclos')
       .select(`
         *,
+        mesociclos(id, nombre, fase, fecha_inicio, fecha_fin),
         macrociclo_judokas(
           id, activo,
           judokas(id, usuario_id, usuarios(nombre, apellido_paterno))
