@@ -99,6 +99,8 @@ const listarTodos = async (req, res, next) => {
       let data
       if (req.usuario.rol === 'admin' || req.usuario.rol === 'asociacion') {
         data = await repo().listarTodos()
+      } else if (req.usuario.rol === 'judoka') {
+        data = await repo().listarTodos()
       } else {
         data = await repo().listarPorSensei(req.usuario.senseiId)
       }

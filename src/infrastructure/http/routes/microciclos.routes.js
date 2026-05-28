@@ -11,7 +11,7 @@ const rolesMiddleware = require('../middlewares/roles.middleware')
 
 router.use(authMiddleware)
 
-router.get('/todos', rolesMiddleware(['admin', 'asociacion', 'sensei']), listarTodos)
+router.get('/todos', rolesMiddleware(['admin', 'asociacion', 'sensei', 'judoka']), listarTodos)
 router.get('/mesociclo/:mesocicloId', rolesMiddleware(['admin', 'asociacion', 'sensei', 'judoka']), listarPorMesociclo)
 router.get('/:id', rolesMiddleware(['admin', 'asociacion', 'sensei', 'judoka']), obtener)
 router.post('/', rolesMiddleware(['sensei']), crear)

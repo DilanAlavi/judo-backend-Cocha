@@ -11,6 +11,9 @@ const listar = async (req, res, next) => {
       let data
       if (req.usuario.rol === 'admin' || req.usuario.rol === 'asociacion') {
         data = await repo().listarTodos()
+      } else if (req.usuario.rol === 'judoka') {
+        // Judokas ven todos los macrociclos para encontrar los suyos y el último disponible
+        data = await repo().listarTodos()
       } else {
         data = await new ListarMacrociclos(repo()).ejecutar(req.usuario.senseiId)
       }

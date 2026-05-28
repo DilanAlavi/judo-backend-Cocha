@@ -20,10 +20,10 @@ router.get(
   listarPorMesociclo
 )
 
-// Listar todos los tests de un judoka (historial)
+// Listar todos los tests de un judoka (historial) — judoka puede ver los suyos
 router.get(
   '/judoka/:judokaId',
-  rolesMiddleware(['admin', 'asociacion', 'sensei']),
+  rolesMiddleware(['admin', 'asociacion', 'sensei', 'judoka']),
   listarPorJudoka
 )
 
