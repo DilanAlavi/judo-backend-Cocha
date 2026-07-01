@@ -194,6 +194,10 @@ class SupabaseMicrocicloRepository {
           id,
           banco_ejercicios(nombre),
           microciclo_ejercicio_judokas(judoka_id)
+        ),
+        microciclo_judokas(
+          judoka_id,
+          judokas(usuario_id, usuarios(nombre, apellido_paterno))
         )
       `)
       .order('fecha', { ascending: false })
@@ -233,6 +237,10 @@ class SupabaseMicrocicloRepository {
           id,
           banco_ejercicios(nombre),
           microciclo_ejercicio_judokas(judoka_id)
+        ),
+        microciclo_judokas(
+          judoka_id,
+          judokas(usuario_id, usuarios(nombre, apellido_paterno))
         )
       `)
       .in('mesociclo_id', mesos.map(m => m.id))
